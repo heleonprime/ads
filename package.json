@@ -1,0 +1,17 @@
+{
+  "name": "ads",
+  "version": "1.0.0",
+  "description": "Advertizing systems codes adapters classes",
+  "private": true,
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "webpack"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "webpack": "^5.89.0",
+    "webpack-cli": "^5.1.4"
+  }
+}
