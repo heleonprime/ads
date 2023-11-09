@@ -6,8 +6,6 @@ import VkDriver from "./drivers/vk_driver";
 import VKInPageDriver from "./drivers/vk_inpage_driver";
 import VPAIDDriver from "./drivers/vpaid_driver";
 
-
-
 var driver = (new URLSearchParams(window.location.search).get('driver')) ?? 'html';
 var adUnit = null;
 ////////////// HTML //////////////
