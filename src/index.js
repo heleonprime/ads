@@ -80,7 +80,7 @@ else if (driver === 'vpaid') {
 
     adUnit.show(document.querySelector("#ad-container"));
 }
-////////////// VK Revarded //////////////////
+////////////// VK Revarded //////////////
 else if (driver === 'rewarded') {
     adUnit = new RewardedDriver({
         ads: {
@@ -107,7 +107,7 @@ else if (driver === 'rewarded') {
 
     adUnit.show('#button');
 }
-////////////// Prebid.js (one ad unit per time) //////////////////
+////////////// Prebid.js (one ad unit per time) //////////////
 else if (driver === 'prebid') {
 
     let pbUrl = 'js/prebid.js';
