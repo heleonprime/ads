@@ -1,0 +1,10 @@
+html,
+body {
+    margin: 0;
+    padding: 0;
+}
+
+#ad-container {
+    width: 600px;
+    height: 460px;
+}

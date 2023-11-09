@@ -13,9 +13,10 @@ if (driver === 'html') {
     adUnit = new HTMLDriver({
         html: `
             <div style="height:100%;">
-                <a href="#" 
+                <a href="?driver=image"
+                   target="_blank"
                    style="width: 100%; height: 100%; display: flex; align-items: center; justify-content: center;">
-                    <span class="some-class">1123123<\/span>
+                    <span class="some-class">Some text to show that the code is working<\/span>
                 <\/a>
                 <script>
                     console.log(1);
@@ -33,7 +34,7 @@ else if (driver === 'image') {
         url: 'https://ih0.redbubble.net/image.234961683.5516/raf,360x360,075,t,fafafa:ca443f4786.jpg',
         debug: 1,                                     // optional
         inIframe: true,                               // optional
-        link: 'https://kinorole.ru/user_evgen/html/', // optional, next available if the link is set
+        link: '?driver=html', // optional, next available if the link is set
         inNewTab: true,                               // optional
         title: 'Some string',                         // optional
     });
@@ -108,6 +109,13 @@ else if (driver === 'rewarded') {
 }
 ////////////// Prebid.js (one ad unit per time) //////////////////
 else if (driver === 'prebid') {
+
+    let pbUrl = 'js/prebid.js';
+    let script = document.createElement('script');
+    script.type = 'text/javascript';
+    script.src = pbUrl;
+    document.head.appendChild(script);
+
     let adUnitConfig = {
         code: 'div-gpt-ad-300x250_stat',
         mediaTypes: {
@@ -238,10 +246,6 @@ else if (driver === 'prebid') {
         }
     };
 
-
     let adUnit = new PrebidDriver({ id: adUnitConfig.code, config: adUnitConfig, pbConfig: pbConfig });
-
     adUnit.show(document.querySelector("#ad-container"));
-
-
 }

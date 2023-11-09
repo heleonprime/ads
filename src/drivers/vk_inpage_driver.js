@@ -27,65 +27,65 @@ export default class VKInPageDriver {
         onError: (data) => {
             switch (data.error) {
                 case 105:
-                    this.l(data.error, 'Media chunk error');
+                    this.l(data.error, 'Media chunk error'); break;
                 case 311:
-                    this.l(data.error, 'No container on the page');
+                    this.l(data.error, 'No container on the page'); break;
                 case 312:
-                    this.l(data.error, 'No place in container');
+                    this.l(data.error, 'No place in container'); break;
                 case 313:
-                    this.l(data.error, 'RenderRunner load error');
+                    this.l(data.error, 'RenderRunner load error'); break;
                 case 314:
-                    this.l(data.error, 'Message system error');
+                    this.l(data.error, 'Message system error'); break;
                 case 315:
-                    this.l(data.error, 'Unacceptable creative');
+                    this.l(data.error, 'Unacceptable creative'); break;
                 case 316:
-                    this.l(data.error, 'Container link error');
+                    this.l(data.error, 'Container link error'); break;
                 case 321:
-                    this.l(data.error, 'Empty ad section');
+                    this.l(data.error, 'Empty ad section'); break;
                 case 322:
-                    this.l(data.error, 'Visit is not an object');
+                    this.l(data.error, 'Visit is not an object'); break;
                 case 323:
-                    this.l(data.error, 'Server error');
+                    this.l(data.error, 'Server error'); break;
                 case 331:
-                    this.l(data.error, 'Config error');
+                    this.l(data.error, 'Config error'); break;
                 case 332:
-                    this.l(data.error, 'Slot is not specified');
+                    this.l(data.error, 'Slot is not specified'); break;
                 case 333:
-                    this.l(data.error, 'Container is not specified');
+                    this.l(data.error, 'Container is not specified'); break;
                 case 341:
-                    this.l(data.error, 'Wrong inline banner (base64)');
+                    this.l(data.error, 'Wrong inline banner (base64)'); break;
                 case 342:
-                    this.l(data.error, 'Wrong inline config. Check the "src" attribute');
+                    this.l(data.error, 'Wrong inline config. Check the "src" attribute'); break;
                 case 351:
-                    this.l(data.error, 'No media in section');
+                    this.l(data.error, 'No media in section'); break;
                 case 352:
-                    this.l(data.error, 'Invalid JSON server response');
+                    this.l(data.error, 'Invalid JSON server response'); break;
                 case 353:
-                    this.l(data.error, 'Config is not an object');
+                    this.l(data.error, 'Config is not an object'); break;
                 case 361:
-                    this.l(data.error, 'Video element error');
+                    this.l(data.error, 'Video element error'); break;
                 case 362:
-                    this.l(data.error, 'Old browser (IntersectionObserver);)');
+                    this.l(data.error, 'Old browser (IntersectionObserver);)'); break;
                 case 5001:
-                    this.l(data.error, 'Common error');
+                    this.l(data.error, 'Common error'); break;
                 case 5002:
-                    this.l(data.error, 'Already initialized');
+                    this.l(data.error, 'Already initialized'); break;
                 case 5003:
-                    this.l(data.error, 'Not initialized');
+                    this.l(data.error, 'Not initialized'); break;
                 case 5004:
-                    this.l(data.error, 'Not in play status');
+                    this.l(data.error, 'Not in play status'); break;
                 case 5005:
-                    this.l(data.error, 'Not in pause status');
+                    this.l(data.error, 'Not in pause status'); break;
                 case 5006:
-                    this.l(data.error, 'The ad is already started');
+                    this.l(data.error, 'The ad is already started'); break;
                 case 5007:
-                    this.l(data.error, 'Destroyed');
+                    this.l(data.error, 'Destroyed'); break;
                 case 5008:
-                    this.l(data.error, 'Forbidden in stream mode (playMode="stream")');
+                    this.l(data.error, 'Forbidden in stream mode (playMode="stream")'); break;
                 case 1100:
-                    this.l(data.error, 'Empty ad response');
+                    this.l(data.error, 'Empty ad response'); break;
                 default:
-                    this.l(data.error, 'Unknown error');
+                    this.l(data.error, 'Unknown error'); break;
             }
             if (data.error === 1100) {
                 this.events.onStop();

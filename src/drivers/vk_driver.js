@@ -33,6 +33,7 @@ export default class VkDriver {
             this.l('Click handler:', this.clickHandler);
             this.clickTarget = this.adContainer; //this.iframe ?? this.container;
             this.l('Click target:', this.clickTarget);
+            this.clickTarget.addEventListener("click", this.clickHandler);
         },
         onAdsRefreshed: () => {
             this.l('onAdsRefreshed')
@@ -138,7 +139,6 @@ export default class VkDriver {
         this.clearContainer();
         this.createAdContainer();
         this.adOptions.element = this.adContainer;
-        this.clickTarget.addEventListener("click", this.clickHandler);
         (window.MRGtag = window.MRGtag || []).push(this.adOptions);
     }
 
