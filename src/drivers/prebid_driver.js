@@ -163,23 +163,17 @@ export default class PrebidDriver {
 
   hide() {
     this.clearContainer();
+
+    this.events.onStop();
+  }
+
+  clearContainer() {
     if (this.focusHandler)
       window.removeEventListener('focus', this.focusHandler);
     if (this.blurHandler)
       window.removeEventListener('blur', this.blurHandler);
     if (this.mouseMoveHandler)
       window.removeEventListener('mousemove', this.mouseMoveHandler);
-    this.events.onStop();
-  }
-
-  clearContainer() {
-    this.l('Clearing container');
-    this.l(this.clickTarget);
-    this.l(this.clickHandler);
-    if (this.clickTarget && this.clickHandler) {
-      this.clickTarget.removeEventListener("click", this.clickHandler);
-    }
-    this.l(this.container);
     if (this.bannerContainer) {
       this.bannerContainer.innerHTML = "";
     }
