@@ -7,4 +7,5 @@ body {
 #ad-container {
     width: 600px;
     height: 460px;
+    border: 1px solid red;
 }

@@ -158,7 +158,7 @@ export default class RewardedDriver {
         this.events.onStop();
     }
 
-    refresh() {
+    reload() {
         this.handleButton();
     }
 

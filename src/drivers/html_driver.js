@@ -110,7 +110,7 @@ export default class HTMLDriver {
         this.events.onStop();
     }
 
-    refresh() {
+    reload() {
         this.clearContainer();
         this.show();
     }

@@ -228,7 +228,7 @@ export default class VKInPageDriver {
         this.events.onStop();
     }
 
-    refresh() {
+    reload() {
         this.show();
     }
 

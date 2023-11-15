@@ -182,7 +182,7 @@ export default class VkDriver {
         this.events.onStop();
     }
 
-    refresh() {
+    reload() {
         this.show();
     }
 

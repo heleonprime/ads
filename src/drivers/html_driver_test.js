@@ -1,17 +1,18 @@
-export default class ImageDriver {
+export default class HTMLDriver_test {
     debug = 0;
-    debugLabel = "%cMPSU Image Driver";
+    debugLabel = "%cMPSU HTML Driver test";
     debugStyles = "color:white; background-color: #3f8be8; padding: 2px 5px; border-radius: 3px;";
     debugGroupOpened = false;
 
     container = null;
 
-    url = '';
-    link = null;
-    title = null;
-    inNewTab = false;
+    html = '';
     inIframe = false;
     iframe = null;
+
+    elementUnderMouse = null;
+    iframeClickedLast = false;
+    firstBlur = false;
 
     impressionTimeoutDuration = 2000;
     impressionTimeout = null;
@@ -21,9 +22,6 @@ export default class ImageDriver {
             border: '0',
             width: "100%",
             height: "100%",
-        },
-        imageStyles: {
-
         }
     };
 
@@ -34,19 +32,14 @@ export default class ImageDriver {
 
     codePosition = 'beforeend';
 
-    image = null;
-
     constructor(settings, events) {
         this.setOption(settings, 'debug');
         this.setOption(settings, 'container');
-        this.setOption(settings, 'url');
+        this.setOption(settings, 'html');
         this.setOption(settings, 'inIframe');
-        this.setOption(settings, 'link');
-        this.setOption(settings, 'inNewTab');
-        this.setOption(settings, 'title');
         this.setOption(settings, 'impressionTimeoutDuration');
 
-        this.setEvents(events);
+        this.setEvents(events)
         this.mergeOptions(settings);
     }
 
@@ -62,7 +55,6 @@ export default class ImageDriver {
             this.events.onImpression();
         }, this.impressionTimeoutDuration);
     }
-
 
     drop(onEvent = false) {
         //this. = null;
@@ -102,6 +94,47 @@ export default class ImageDriver {
         this.clearContainer();
         this.addCode();
         this.setImpressionTimeout();
+        this.setWindowEvents();
+    }
+
+    setWindowEvents() {
+        this.focusHandler = ((e) => { this.windowFocussed(e) }).bind(this);
+        window.addEventListener('focus', this.focusHandler, true);
+        this.blurHandler = ((e) => { this.windowBlurred(e) }).bind(this);
+        window.addEventListener('blur', this.blurHandler, true);
+        this.mouseMoveHandler = ((e) => { this.windowMouseMove(e) }).bind(this);
+        window.addEventListener('mousemove', this.mouseMoveHandler, { passive: true });
+    }
+
+    windowBlurred(e) {
+        var el = document.activeElement;
+        if (el === this.iframe) {
+            this.l('Iframe CLICKED ON');
+            this.iframeClickedLast = true;
+            this.events.onClick();
+        }
+    }
+
+    windowFocussed(e) {
+        if (this.iframeClickedLast) {
+            this.iframeClickedLast = false;
+            this.l('Iframe CLICKED OFF');
+        }
+    }
+
+    windowMouseMove(e) {
+        let elementUnderMouse = document.elementFromPoint(e.clientX, e.clientY)
+        if (elementUnderMouse !== this.elementUnderMouse) {
+            if (elementUnderMouse === this.container || elementUnderMouse === this.iframe) {
+                this.l("The container is under mouse");
+            }
+            else {
+                window.focus();
+                this.iframeClickedLast = false;
+            }
+            this.elementUnderMouse = elementUnderMouse;
+            this.l("Element under mouse:", this.elementUnderMouse);
+        }
     }
 
     clearContainer() {
@@ -128,8 +161,8 @@ export default class ImageDriver {
     }
 
     addCode() {
-        if (this.container && this.url) {
-            let c = null;
+        if (this.container && this.html) {
+            let c;
             if (this.inIframe) {
                 this.iframe = document.createElement('iframe');
                 this.setIframeStyles();
@@ -140,32 +173,13 @@ export default class ImageDriver {
             else {
                 c = this.container;
             }
-
-            let target = null;
-
-            this.image = document.createElement('img');
-            this.image.src = this.url;
-
-            if (this.link) {
-                let link = document.createElement('a');
-                link.href = this.link;
-                if (this.inNewTab) {
-                    link.target = "_blank";
-                    link.rel = "noopener noreferrer";
-                }
-                if (this.title) {
-                    link.title = this.title;
-                }
-                link.appendChild(this.image);
-                target = link;
+            c.insertAdjacentHTML(this.codePosition, this.html);
+            let scripts = c.querySelectorAll('script');
+            if (scripts.length) {
+                scripts.forEach((script) => {
+                    this.recreateScript(script);
+                })
             }
-            else {
-                target = this.image;
-            }
-
-            this.l(c);
-            c.appendChild(target);
-
             this.clickHandler = this.click.bind(this)
             this.l('Click handler:', this.clickHandler);
             this.clickTarget = c; //this.iframe ?? this.container;
@@ -180,6 +194,23 @@ export default class ImageDriver {
                 this.iframe.style[k] = this.options.iframeStyles[k];
             });
         }
+    }
+
+    copyAttributes(source, target) {
+        return Array.from(source.attributes).forEach(attribute => {
+            target.setAttribute(
+                attribute.nodeName === 'id' ? 'data-id' : attribute.nodeName,
+                attribute.nodeValue,
+            );
+        });
+    }
+
+    recreateScript(script) {
+        let s = document.createElement('script');
+        this.copyAttributes(script, s);
+        script.before(s);
+        s.innerHTML = script.innerHTML;
+        script.remove();
     }
 
     click() {

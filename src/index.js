@@ -1,4 +1,5 @@
 import HTMLDriver from "./drivers/html_driver";
+//import HTMLDriver_test from "./drivers/html_driver_test";
 import ImageDriver from "./drivers/image_driver";
 import PrebidDriver from "./drivers/prebid_driver";
 import RewardedDriver from "./drivers/rewarded_driver";
@@ -8,14 +9,28 @@ import VPAIDDriver from "./drivers/vpaid_driver";
 
 var driver = (new URLSearchParams(window.location.search).get('driver')) ?? 'html';
 var adUnit = null;
+var container = document.querySelector("#ad-container");
 ////////////// HTML //////////////
+/*if (driver === 'html_test') {
+    adUnit = new HTMLDriver_test({
+        html: `
+            <div style="height:100%; overflow: hidden">
+                <iframe style="width: 100%; height: 100%; overflow: hidden" src="https://kinorole.ru/user_evgen/public/?driver=html"></iframe>
+            </div>`,
+        debug: 1,       // optional
+        inIframe: true, // optional
+    });
+
+    adUnit.show(container);
+}*/
+////////////// HTML - for iframe test purposes //////////////
 if (driver === 'html') {
     adUnit = new HTMLDriver({
         html: `
-            <div style="height:100%;">
+            <div style="height:100%; overflow: hidden">
                 <a href="?driver=image"
-                   target="_blank"
-                   style="width: 100%; height: 100%; display: flex; align-items: center; justify-content: center;">
+                        target="_blank"
+                        style="width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; overflow: hidden">
                     <span class="some-class">Some text to show that the code is working<\/span>
                 <\/a>
                 <script>
@@ -23,10 +38,10 @@ if (driver === 'html') {
                 <\/script>
             </div>`,
         debug: 1,       // optional
-        inIframe: true, // optional
+        inIframe: false, // optional
     });
 
-    adUnit.show(document.querySelector("#ad-container"));
+    adUnit.show(container);
 }
 ////////////// Image //////////////
 else if (driver === 'image') {
@@ -39,7 +54,7 @@ else if (driver === 'image') {
         title: 'Some string',                         // optional
     });
 
-    adUnit.show(document.querySelector("#ad-container"));
+    adUnit.show(container);
 }
 ////////////// VK //////////////
 else if (driver === 'vk') {
@@ -52,7 +67,7 @@ else if (driver === 'vk') {
         debug: 1,   // optional
     });
 
-    adUnit.show(document.querySelector("#ad-container"));
+    adUnit.show(container);
 }
 ////////////// VK InPage //////////////
 else if (driver === 'inpage') {
@@ -65,7 +80,7 @@ else if (driver === 'inpage') {
         debug: 1,
     });
 
-    adUnit.show(document.querySelector("#ad-container"));
+    adUnit.show(container);
 }
 
 ////////////// VPAID //////////////
@@ -78,7 +93,7 @@ else if (driver === 'vpaid') {
         loop: true,        // optional
     });
 
-    adUnit.show(document.querySelector("#ad-container"));
+    adUnit.show(container);
 }
 ////////////// VK Revarded //////////////
 else if (driver === 'rewarded') {
@@ -246,6 +261,9 @@ else if (driver === 'prebid') {
         }
     };
 
-    let adUnit = new PrebidDriver({ id: adUnitConfig.code, config: adUnitConfig, pbConfig: pbConfig });
-    adUnit.show(document.querySelector("#ad-container"));
+    container.style.width = "300px";
+    container.style.height = "250px";
+
+    let adUnit = new PrebidDriver({ id: adUnitConfig.code, config: adUnitConfig, pbConfig: pbConfig, debug: 1 });
+    adUnit.show(container);
 }

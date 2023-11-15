@@ -332,7 +332,7 @@ export default class VPAIDDriver {
     this.clearContainer();
   }
 
-  refresh() {
+  reload() {
     this.l('Refreshing player');
     if (this.status === 'dropped') {
       this.reInit();
@@ -700,7 +700,7 @@ export default class VPAIDDriver {
         this.controlsElement.remove();
         this.logo.remove();
         if (this.loop) {
-          this.refresh();
+          this.reload();
         }
       });
     this.adsManager.addEventListener(
@@ -761,7 +761,7 @@ export default class VPAIDDriver {
   onContentResumeRequested() {
     this.l("Content resume requested");
     if (this.loop) {
-      this.refresh();
+      this.reload();
     }
   }
 

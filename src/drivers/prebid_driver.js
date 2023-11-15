@@ -3,8 +3,13 @@ export default class PrebidDriver {
   parentContainer = null;
   bannerContainer = null;
   debug = 0;
+  debug = 0;
+  debugLabel = "%cMPSU Prebid Driver";
+  debugStyles = "color:white; background-color: #3f8be8; padding: 2px 5px; border-radius: 3px;";
+  debugGroupOpened = false;
   timeout = 2000;
   adUnit = null;
+  iframeClickedLast = false;
   requestBidsObj = null;
   preferredCurrency = 'RUB';
   unsoldRefreshTimeout = 1000;
@@ -14,6 +19,13 @@ export default class PrebidDriver {
   impressionTimeout = null;
   clickHandler = null;
   clickTarget = null;
+  iframe = null;
+  elementUnderMouse = null;
+  iframeClickedLast = false;
+  firstBlur = false;
+  focusHandler = null;
+  blurHandler = null;
+  mouseMoveHandler = null;
 
   pbConfig = {
     currency: {
@@ -88,13 +100,9 @@ export default class PrebidDriver {
       return false;
     }
     this.adUnit = settings.config;
-    if (settings && settings.pbConfig) {
-      this.pbConfig = settings.pbConfig;
-    }
-    if (settings && settings.timeout) {
-      this.timeout = settings.timeout;
-    }
-
+    if (settings.pbConfig) this.pbConfig = settings.pbConfig;
+    if (settings.timeout) this.timeout = settings.timeout;
+    if (settings.debug) this.debug = settings.debug;
     if (new URLSearchParams(window.location.search).get('pbjs_debug') == 'true')
       this.debug = 1;
 
@@ -111,6 +119,12 @@ export default class PrebidDriver {
     });
 
     this.setEvents(events)
+  }
+
+  setOption(s, o) {
+    if (typeof s[o] !== 'undefined') {
+      this[o] = s[o];
+    }
   }
 
   setEvents = (events) => {
@@ -149,6 +163,12 @@ export default class PrebidDriver {
 
   hide() {
     this.clearContainer();
+    if (this.focusHandler)
+      window.removeEventListener('focus', this.focusHandler);
+    if (this.blurHandler)
+      window.removeEventListener('blur', this.blurHandler);
+    if (this.mouseMoveHandler)
+      window.removeEventListener('mousemove', this.mouseMoveHandler);
     this.events.onStop();
   }
 
@@ -180,15 +200,13 @@ export default class PrebidDriver {
 
   addCode(bid, position = 'beforeend') {
     this.l(this.adUnitId + ' adding code');
-    let iframe = document.createElement('iframe');
-    iframe.frameBorder = '0';
-    iframe.scrolling = "no";
-    iframe.style = 'width:' + bid.width + 'px;height:' + bid.height + 'px;overflow:hidden';
+    this.iframe = document.createElement('iframe');
+    this.iframe.style = 'width:' + bid.width + 'px;height:' + bid.height + 'px;overflow:hidden; border: 0; overflow: hidden;';
     this.clearContainer();
     if (bid.ad) {
-      this.bannerContainer.appendChild(iframe);
-      let iframeDoc = iframe.contentWindow.document;
-      iframeDoc.body.style = 'margin: 0;'
+      this.bannerContainer.appendChild(this.iframe);
+      let iframeDoc = this.iframe.contentWindow.document;
+      iframeDoc.body.style = 'margin: 0;';
       iframeDoc.body.insertAdjacentHTML(position, bid.ad);
       let scripts = iframeDoc.body.querySelectorAll('script');
       if (scripts.length) {
@@ -198,10 +216,52 @@ export default class PrebidDriver {
       }
     }
     else if (bid.adUrl) {
-      iframe.src = bid.adUrl;
-      this.bannerContainer.appendChild(iframe);
+      this.iframe.src = bid.adUrl;
+      this.bannerContainer.appendChild(this.iframe);
+    }
+    this.setWindowEvents();
+  }
+
+  setWindowEvents() {
+    this.focusHandler = ((e) => { this.windowFocussed(e) }).bind(this);
+    window.addEventListener('focus', this.focusHandler, true);
+    this.blurHandler = ((e) => { this.windowBlurred(e) }).bind(this);
+    window.addEventListener('blur', this.blurHandler, true);
+    this.mouseMoveHandler = ((e) => { this.windowMouseMove(e) }).bind(this);
+    window.addEventListener('mousemove', this.mouseMoveHandler, { passive: true });
+  }
+
+  windowBlurred(e) {
+    var el = document.activeElement;
+    if (el === this.iframe) {
+      this.l('Iframe CLICKED ON');
+      this.iframeClickedLast = true;
+      this.events.onClick();
     }
   }
+
+  windowFocussed(e) {
+    if (this.iframeClickedLast) {
+      this.iframeClickedLast = false;
+      this.l('Iframe CLICKED OFF');
+    }
+  }
+
+  windowMouseMove(e) {
+    let elementUnderMouse = document.elementFromPoint(e.clientX, e.clientY)
+    if (elementUnderMouse !== this.elementUnderMouse) {
+      if (elementUnderMouse === this.container || elementUnderMouse === this.iframe) {
+        this.l("The container is under mouse");
+      }
+      else {
+        window.focus();
+        this.iframeClickedLast = false;
+      }
+      this.elementUnderMouse = elementUnderMouse;
+      this.l("Element under mouse:", this.elementUnderMouse);
+    }
+  }
+
   copyAttributes(source, target) {
     return Array.from(source.attributes).forEach(attribute => {
       target.setAttribute(
@@ -230,11 +290,6 @@ export default class PrebidDriver {
         if (this.bannerContainer) {
           this.addCode(winningBid);
           this.setImpressionTimeout();
-          this.clickHandler = this.click.bind(this)
-          this.l('Click handler:', this.clickHandler);
-          this.clickTarget = this.bannerContainer;
-          this.l('Click target:', this.clickTarget);
-          this.clickTarget.addEventListener("click", this.clickHandler);
         }
         else {
           this.l(this.adUnitId + " No container with Ad unit ID in DOM");
@@ -265,7 +320,29 @@ export default class PrebidDriver {
     this.events.onClick();
   }
 
+  // Debug
+
   l(...args) {
-    if (this.debug) console.log(...args)
+    if (this.debug) {
+      if (!this.debugGroupOpened)
+        console.log(this.debugLabel, this.debugStyles, ...args);
+      else
+        console.log(...args);
+    }
   }
+
+  lg(label = "") {
+    if (this.debug && !this.debugGroupOpened) {
+      this.debugGroupOpened = true;
+      console.groupCollapsed(this.debugLabel, this.debugStyles, label);
+    }
+  }
+
+  lge() {
+    if (this.debug && this.debugGroupOpened) {
+      this.debugGroupOpened = false;
+      console.groupEnd();
+    }
+  }
+
 }
